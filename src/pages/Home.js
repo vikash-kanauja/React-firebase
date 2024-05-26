@@ -9,7 +9,6 @@ const Home = () => {
     try {
       signOut(auth)
       navigate("/");
-      console.log("Signed out successfully")
     }
     catch (error) {
     }

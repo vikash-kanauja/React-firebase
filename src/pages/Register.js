@@ -1,40 +1,70 @@
 import React, { useState } from "react";
+import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
-import { signupUser, storeUserData } from "../redux/reducer/authReducer"
+import { signupUser, storeUserData } from "../redux/reducer/authReducer";
 import { useNavigate } from "react-router-dom";
 import { FaUserCircle } from "react-icons/fa";
+import { validateForm } from "../utils/formValidation";
+import ConfirmationModal from "../components/ConfirmationModal";
 
 const Register = () => {
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
-    mobileNo: "",
+    phoneNumber: "",
     profilePhoto: null,
     email: "",
     password: "",
     confirmPassword: "",
   });
+  const [errors, setErrors] = useState({});
+  const [showPasswords, setShowPasswords] = useState({
+    showPassword: false,
+    showConfirmPassword: false,
+  });
+  const [showModal, setShowModal] = useState(false);
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  const { loading } = useSelector(state => state.auth)
+  const { loading } = useSelector((state) => state.auth);
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
+    setErrors({ ...errors, [e.target.name]: null });
   };
 
   const handlePhotoChange = (e) => {
     setFormData({
-      ...formData, profilePhoto: e.target.files[0],
+      ...formData,
+      profilePhoto: e.target.files[0],
     });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const res = await dispatch(signupUser({ email: formData.email, password: formData.password }));
-    const userId = res.payload.uid
-    if (userId) {
-      await dispatch(storeUserData({ userId, formData }))
+    const validationErrors = validateForm(formData);
+    const isValid = Object.values(validationErrors).every(
+      (error) => error === null
+    );
+
+    if (isValid) {
+      const res = await dispatch(
+        signupUser({ email: formData.email, password: formData.password })
+      );
+      if (res?.payload?.message) {
+        setErrors({ ...errors, email: "Email already registered" });
+        return;
+      }
+      const userId = res.payload.uid;
+      if (userId) {
+        setShowModal(true);
+        await dispatch(storeUserData({ userId, formData }));
+      }
+    } else {
+      setErrors(validationErrors);
     }
+  };
+  const modalHandleNavigate = () => {
+    setShowModal(false);
     navigate("/home");
   };
   return (
@@ -43,15 +73,21 @@ const Register = () => {
         <div className="absolute inset-0 bg-gradient-to-r from-cyan-400 to-sky-500 shadow-lg transform -skew-y-6 sm:skew-y-0 sm:-rotate-6 sm:rounded-md"></div>
         <div className="relative px-8 py-10 2xl:px-8 2xl:py-12 bg-white shadow-lg sm:rounded-md sm:p-6">
           <div className="max-w-md mx-auto">
-          <div className="flex justify-center">
+            <div className="flex justify-center">
               {formData.profilePhoto ? (
-                <img className="w-16 h-16 md:w-16 md:h-16 lg:w-20 lg:h-20 xl:w-24 xl:h-24  rounded-full border-2 border-sky-300" src={URL.createObjectURL(formData.profilePhoto)} alt="Profile Preview" />
-              ):<FaUserCircle className="w-16 h-16 md:w-16 md:h-16 lg:w-20 lg:h-20 xl:w-24 xl:h-24  rounded-full border-2 border-sky-300"/>}
+                <img
+                  className="w-16 h-16 md:w-16 md:h-16 lg:w-20 lg:h-20 xl:w-24 xl:h-24  rounded-full border-2 border-sky-300"
+                  src={URL.createObjectURL(formData.profilePhoto)}
+                  alt="Profile Preview"
+                />
+              ) : (
+                <FaUserCircle className="w-16 h-16 md:w-16 md:h-16 lg:w-20 lg:h-20 xl:w-24 xl:h-24  rounded-full border-2 border-sky-300" />
+              )}
             </div>
             <div>
               <h1 className="text-2xl font-bold text-center">Register</h1>
             </div>
-            
+
             <div className="divide-y divide-gray-200">
               <div className="py-4 text-base leading-6 space-y-4 text-gray-700 sm:text-lg sm:leading-7">
                 <div className="relative mt-0">
@@ -71,6 +107,11 @@ const Register = () => {
                   >
                     First Name
                   </label>
+                  {errors.firstName && (
+                    <span className="text-red-400 text-sm">
+                      {errors.firstName}
+                    </span>
+                  )}
                 </div>
                 <div className="relative">
                   <input
@@ -89,34 +130,50 @@ const Register = () => {
                   >
                     Last Name
                   </label>
+                  {errors.lastName && (
+                    <span className="text-red-400 text-sm">
+                      {errors.lastName}
+                    </span>
+                  )}
                 </div>
                 <div className="relative">
                   <input
                     autoComplete="off"
-                    id="mobileNo"
+                    id="phoneNumber"
                     type="text"
-                    name="mobileNo"
+                    name="phoneNumber"
                     placeholder="Mobile No."
-                    value={formData.mobileNo}
+                    value={formData.phoneNumber}
                     onChange={handleChange}
                     className="peer placeholder-transparent h-10 w-full border-b-2 border-gray-300 text-gray-900 focus:outline-none focus:border-green-600"
                   />
                   <label
-                    htmlFor="mobileNo"
+                    htmlFor="phoneNumber"
                     className="absolute left-0 -top-3.5 text-gray-600 text-sm peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-440 peer-placeholder-shown:top-2 transition-all peer-focus:-top-3.5 peer-focus:text-gray-600 peer-focus:text-sm"
                   >
                     Mobile No
                   </label>
+                  {errors.phoneNumber && (
+                    <span className="text-red-400 text-sm">
+                      {errors.phoneNumber}
+                    </span>
+                  )}
                 </div>
                 <div className="relative">
                   <input
                     type="file"
+                    accept="image/*"
                     name="profilePhoto"
                     onChange={handlePhotoChange}
                     className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
                   />
-
+                  {errors.profilePhoto && (
+                    <span className="text-red-400 text-sm">
+                      {errors.profilePhoto}
+                    </span>
+                  )}
                 </div>
+
                 <div className="relative">
                   <input
                     autoComplete="off"
@@ -134,12 +191,15 @@ const Register = () => {
                   >
                     Email
                   </label>
+                  {errors.email && (
+                    <span className="text-red-400 text-sm">{errors.email}</span>
+                  )}
                 </div>
                 <div className="relative">
                   <input
                     autoComplete="off"
                     id="password"
-                    type="password"
+                    type={showPasswords.showPassword ? "text" : "password"}
                     name="password"
                     placeholder="Password"
                     value={formData.password}
@@ -152,12 +212,33 @@ const Register = () => {
                   >
                     Password
                   </label>
+                  <div className="absolute right-2 top-[30%] z-10">
+                    <button
+                      type="button"
+                      className=" right-0 top-[50%]"
+                      onClick={() =>
+                        setShowPasswords({
+                          ...showPasswords,
+                          showPassword: !showPasswords.showPassword,
+                        })
+                      }
+                    >
+                      {showPasswords.showPassword ? <FaEyeSlash /> : <FaEye />}
+                    </button>
+                  </div>
                 </div>
+                {errors.password && (
+                  <span className="text-red-400 text-sm">
+                    {errors.password}
+                  </span>
+                )}
                 <div className="relative">
                   <input
                     autoComplete="off"
                     id="confirmPassword"
-                    type="password"
+                    type={
+                      showPasswords.showConfirmPassword ? "text" : "password"
+                    }
                     name="confirmPassword"
                     placeholder="Confirm Password"
                     value={formData.confirmPassword}
@@ -170,7 +251,31 @@ const Register = () => {
                   >
                     Confirm Password
                   </label>
+                  <div className="absolute right-2 top-[25%] z-10">
+                    <button
+                      type="button"
+                      className=" right-0 top-[50%]"
+                      onClick={() =>
+                        setShowPasswords({
+                          ...showPasswords,
+                          showConfirmPassword:
+                            !showPasswords.showConfirmPassword,
+                        })
+                      }
+                    >
+                      {showPasswords.showConfirmPassword ? (
+                        <FaEyeSlash />
+                      ) : (
+                        <FaEye />
+                      )}
+                    </button>
+                  </div>
                 </div>
+                {errors.confirmPassword && (
+                  <span className="text-red-400 text-sm">
+                    {errors.confirmPassword}
+                  </span>
+                )}
                 <div className="relative text-center">
                   <button
                     className=" bg-cyan-500 text-white rounded-md px-4 py-1 "
@@ -197,6 +302,15 @@ const Register = () => {
             </button>
           </div>
         </div>
+        {showModal && (
+          <ConfirmationModal
+            heading={"Successfully"}
+            message={`${"User signup Succesfully!"}`}
+            clickOkButton={modalHandleNavigate}
+            buttonText={"Ok"}
+            col
+          />
+        )}
       </div>
     </div>
   );
