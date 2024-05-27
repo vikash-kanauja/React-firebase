@@ -1,11 +1,9 @@
-// src/validation.js
 export const validateEmail = (email) => {
-    const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!email) {
-      return "Email is required";
-    } else if (!re.test(String(email).toLowerCase())) {
-      return "Invalid email address";
-    }
+  if (!email.trim()) {
+    return "Email is required";
+  } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    return "Email is invalid";
+  }
     return null;
   };
   export const validatePassword = (password) => {
@@ -26,11 +24,11 @@ export const validateEmail = (email) => {
     return null;
   };
   
-  export const validateName = (name) => {
+  export const validateName = (name,inputName) => {
     if (!name.trim()) {
       return "Name is required";
     }else if (name.trim().length < 4) {
-      return "firstName must be contain 4 character"
+      return `${inputName} must be contain 4 character`
     }
     return null;
   };
@@ -46,12 +44,9 @@ export const validateEmail = (email) => {
   };
   
   export const validateProfilePhoto = (file) => {
-    const validTypes = ["image/jpeg", "image/png", "image/gif"];
     if (!file) {
       return "Profile photo is required";
-    } else if (!validTypes.includes(file.type)) {
-      return "Invalid file type. Only images are allowed";
-    }
+    } 
     return null;
   };
   
@@ -71,11 +66,11 @@ export const validateEmail = (email) => {
     }
 
     if (formData.firstName !== undefined) {
-      errors.firstName = validateName(formData.firstName);
+      errors.firstName = validateName(formData.firstName,"First name" );
     }
   
     if (formData.lastName !== undefined) {
-      errors.lastName = validateName(formData.lastName);
+      errors.lastName = validateName(formData.lastName,"Last name");
     }
   
     if (formData.phoneNumber !== undefined) {

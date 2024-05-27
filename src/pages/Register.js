@@ -3,7 +3,6 @@ import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
 import { signupUser, storeUserData } from "../redux/reducer/authReducer";
 import { useNavigate } from "react-router-dom";
-import { FaUserCircle } from "react-icons/fa";
 import { validateForm } from "../utils/formValidation";
 import ConfirmationModal from "../components/ConfirmationModal";
 
@@ -33,10 +32,19 @@ const Register = () => {
   };
 
   const handlePhotoChange = (e) => {
-    setFormData({
-      ...formData,
-      profilePhoto: e.target.files[0],
-    });
+      const selectedFile = e.target.files[0];
+      if (selectedFile) {
+        const validTypes = ["image/jpeg", "image/png", "image/gif"];
+        if (!validTypes.includes(selectedFile.type)) {
+          setErrors({ ...errors, profilePhoto: "Invalid file type. Only images are allowed" });
+        } else {
+          setFormData({
+            ...formData,
+            profilePhoto: selectedFile,
+          });
+          setErrors({ ...errors, profilePhoto: null });
+        }
+      }
   };
 
   const handleSubmit = async (e) => {
@@ -50,8 +58,11 @@ const Register = () => {
       const res = await dispatch(
         signupUser({ email: formData.email, password: formData.password })
       );
-      if (res?.payload?.message) {
-        setErrors({ ...errors, email: "Email already registered" });
+      if (res?.payload?.message === 'Firebase: Error (auth/invalid-email).') {
+        setErrors({ ...errors, email: "Invalid email" });
+        return;
+      }else if(res?.payload?.message === 'Firebase: Error (auth/email-already-in-use).'){
+        setErrors({ ...errors, email: "Email already in use"});
         return;
       }
       const userId = res.payload.uid;
@@ -74,15 +85,6 @@ const Register = () => {
         <div className="relative px-8 py-10 2xl:px-8 2xl:py-12 bg-white shadow-lg sm:rounded-md sm:p-6">
           <div className="max-w-md mx-auto">
             <div className="flex justify-center">
-              {formData.profilePhoto ? (
-                <img
-                  className="w-16 h-16 md:w-16 md:h-16 lg:w-20 lg:h-20 xl:w-24 xl:h-24  rounded-full border-2 border-sky-300"
-                  src={URL.createObjectURL(formData.profilePhoto)}
-                  alt="Profile Preview"
-                />
-              ) : (
-                <FaUserCircle className="w-16 h-16 md:w-16 md:h-16 lg:w-20 lg:h-20 xl:w-24 xl:h-24  rounded-full border-2 border-sky-300" />
-              )}
             </div>
             <div>
               <h1 className="text-2xl font-bold text-center">Register</h1>
@@ -99,7 +101,7 @@ const Register = () => {
                     placeholder="First Name"
                     value={formData.firstName}
                     onChange={handleChange}
-                    className="peer placeholder-transparent h-10 w-full border-b-2 border-gray-300 text-gray-900 focus:outline-none focus:border-green-600"
+                    className="peer placeholder-transparent h-10 w-full border-b-2 border-gray-300 text-gray-900 focus:outline-none focus:border-sky-400"
                   />
                   <label
                     htmlFor="firstName"
@@ -122,7 +124,7 @@ const Register = () => {
                     placeholder="Last Name"
                     value={formData.lastName}
                     onChange={handleChange}
-                    className="peer placeholder-transparent h-10 w-full border-b-2 border-gray-300 text-gray-900 focus:outline-none focus:border-green-600"
+                    className="peer placeholder-transparent h-10 w-full border-b-2 border-gray-300 text-gray-900 focus:outline-none focus:border-sky-400"
                   />
                   <label
                     htmlFor="LastName"
@@ -140,12 +142,12 @@ const Register = () => {
                   <input
                     autoComplete="off"
                     id="phoneNumber"
-                    type="text"
+                    type="number"
                     name="phoneNumber"
                     placeholder="Mobile No."
                     value={formData.phoneNumber}
                     onChange={handleChange}
-                    className="peer placeholder-transparent h-10 w-full border-b-2 border-gray-300 text-gray-900 focus:outline-none focus:border-green-600"
+                    className="peer placeholder-transparent h-10 w-full border-b-2 border-gray-300 text-gray-900 focus:outline-none focus:border-sky-400"
                   />
                   <label
                     htmlFor="phoneNumber"
@@ -159,20 +161,29 @@ const Register = () => {
                     </span>
                   )}
                 </div>
-                <div className="relative">
+                <div className="relative flex items-center justify-between ">
                   <input
                     type="file"
                     accept="image/*"
                     name="profilePhoto"
                     onChange={handlePhotoChange}
-                    className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+                    className="appearance-none rounded-none relative block w-[70%] py-2 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
                   />
-                  {errors.profilePhoto && (
+                  <div>
+                    {formData.profilePhoto && (
+                      <img
+                        className="w-16 h-16 md:w-16 md:h-16 lg:w-20 lg:h-20 xl:w-24 xl:h-24 rounded-md border-2 border-sky-300"
+                        src={URL.createObjectURL(formData.profilePhoto)}
+                        alt="Profile Preview"
+                      />
+                    )}
+                  </div>
+                </div>
+                {errors.profilePhoto && (
                     <span className="text-red-400 text-sm">
                       {errors.profilePhoto}
                     </span>
                   )}
-                </div>
 
                 <div className="relative">
                   <input
@@ -183,7 +194,7 @@ const Register = () => {
                     placeholder="Email"
                     value={formData.email}
                     onChange={handleChange}
-                    className="peer placeholder-transparent h-10 w-full border-b-2 border-gray-300 text-gray-900 focus:outline-none focus:border-green-600"
+                    className="peer placeholder-transparent h-10 w-full border-b-2 border-gray-300 text-gray-900 focus:outline-none focus:border-sky-400"
                   />
                   <label
                     htmlFor="Email"
@@ -204,7 +215,7 @@ const Register = () => {
                     placeholder="Password"
                     value={formData.password}
                     onChange={handleChange}
-                    className="peer placeholder-transparent h-10 w-full border-b-2 border-gray-300 text-gray-900 focus:outline-none focus:border-green-600"
+                    className="peer placeholder-transparent h-10 w-full border-b-2 border-gray-300 text-gray-900 focus:outline-none focus:border-sky-400"
                   />
                   <label
                     htmlFor="password"
@@ -228,7 +239,7 @@ const Register = () => {
                   </div>
                 </div>
                 {errors.password && (
-                  <span className="text-red-400 text-sm">
+                  <span className="text-red-400 text-sm leading-[8px] ">
                     {errors.password}
                   </span>
                 )}
@@ -243,7 +254,7 @@ const Register = () => {
                     placeholder="Confirm Password"
                     value={formData.confirmPassword}
                     onChange={handleChange}
-                    className="peer placeholder-transparent h-10 w-full border-b-2 border-gray-300 text-gray-900 focus:outline-none focus:border-green-600"
+                    className="peer placeholder-transparent h-10 w-full border-b-2 border-gray-300 text-gray-900 focus:outline-none focus:border-sky-400"
                   />
                   <label
                     htmlFor="confirmPassword"
@@ -303,7 +314,6 @@ const Register = () => {
             message={`${"User signup Succesfully!"}`}
             clickOkButton={modalHandleNavigate}
             buttonText={"Ok"}
-            col
           />
         )}
       </div>
