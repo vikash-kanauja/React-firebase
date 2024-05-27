@@ -15,11 +15,11 @@ const Home = () => {
   }
   return (
     <nav>
-      <p>
+      <p className='text-center'>
         Welcome Home
       </p>
-      <div>
-        <button onClick={handleLogout}>
+      <div className='text-center '>
+        <button className='p-1 bg-sky-400 rounded-sm' onClick={handleLogout}>
           Logout
         </button>
       </div>
