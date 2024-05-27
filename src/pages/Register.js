@@ -311,7 +311,7 @@ const Register = () => {
         {showModal && (
           <ConfirmationModal
             heading={"Successfully"}
-            message={`${"User signup Succesfully!"}`}
+            message={`${"User Register Succesfully!"}`}
             clickOkButton={modalHandleNavigate}
             buttonText={"Ok"}
           />
