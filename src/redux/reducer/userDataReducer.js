@@ -1,20 +1,30 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import { collection, getDocs } from 'firebase/firestore';
 import { db } from '../../firebase/firebaseConfig';
+import {
+    collection,
+    getDocs,
+    query,
+    where,
+  } from "firebase/firestore";
 
 export const fetchData = createAsyncThunk(
   'data/fetchData',
-  async () => {
-    const querySnapshot = await getDocs(collection(db, 'users'));
-    const data = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-    return data;
+  async (uid) => {
+    try {
+      const usersCollectionRef = collection(db, "users");
+      const q = query(usersCollectionRef, where("uid", "==", `${uid}`));
+      const data = await getDocs(q);
+      return { ...data?.docs[0]?.data(), id: data?.docs[0]?.id };
+    } catch (error) {
+      return error;
+    }
   }
 );
 
 const userDataSlice = createSlice({
   name: 'data',
   initialState: {
-    items: [],
+    items: {},
     loading:false,
     error: null,
   },

@@ -12,7 +12,7 @@ const LoginPage = () => {
     })
     const [errors, setErrors] = useState({});
     const [showPassword, setShowPassword] = useState(false);
-    const { loading } = useSelector((state) => state.auth);
+    const { loading ,user } = useSelector((state) => state.auth);
     const handleChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
         setErrors({ ...errors, [e.target.name]: null });
@@ -30,6 +30,7 @@ const LoginPage = () => {
             const response = await dispatch(
                 loginUser({ email: formData.email, password: formData.password })
             );
+            console.log(response.uid,";dlfszkknfdnkslskldndf");
             if (
                 response.payload?.message === "Firebase: Error (auth/invalid-credential)." ||
                 response.payload?.message === "Firebase: Error (auth/invalid-email)."

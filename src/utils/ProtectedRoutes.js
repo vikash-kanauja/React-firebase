@@ -1,33 +1,34 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import {auth} from "../firebase/firebaseConfig"
+import { auth } from "../firebase/firebaseConfig";
 import { onAuthStateChanged } from "firebase/auth";
+import { useDispatch } from "react-redux";
+import { fetchData } from "../redux/reducer/userDataReducer";
 
 const ProtectedRoutes = ({ Component, redirectTo, publicRoute }) => {
   const navigate = useNavigate();
-  const [isAuthenticated ,setIsAuthenticated] = useState(null)
+  const dispatch = useDispatch()
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   useEffect(() => {
-    console.log("running use effet");
-    onAuthStateChanged(auth, (user) => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {
-        setIsAuthenticated(user)
-        navigate(redirectTo);
+        setIsAuthenticated(true);
+        dispatch(fetchData(user.uid))
       } else {
-        setIsAuthenticated(null)
-        navigate('/')
+        setIsAuthenticated(false);
       }
     });
+    return () => unsubscribe();
   }, []);
 
-  useEffect(() => {
     if (!publicRoute && !isAuthenticated) {
       navigate('/');
     }
     if (publicRoute && isAuthenticated) {
       navigate(redirectTo);
     }
-  }, [publicRoute, navigate, redirectTo]);
+
   return <Component />;
 };
 
