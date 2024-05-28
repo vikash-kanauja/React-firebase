@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
 import { signupUser, storeUserData } from "../redux/reducer/authReducer";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { validateForm } from "../utils/formValidation";
 import ConfirmationModal from "../components/ConfirmationModal";
 
@@ -304,10 +304,16 @@ const Register = () => {
                     )}
                   </button>
                 </div>
+                <div>
+                  <p className="text-base text-center font-semibold">Already have an account? <Link className="text-blue-600" to="/login">Login</Link></p>
+                </div>
               </div>
             </div>
           </div>
         </div>
+        
+
+        {/* <p className="text-base text-center font-semibold">Already have an account? <Link className="text-blue-600" to="/">Login</Link></p> */}
         {showModal && (
           <ConfirmationModal
             heading={"Successfully"}

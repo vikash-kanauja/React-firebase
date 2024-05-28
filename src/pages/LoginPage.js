@@ -1,13 +1,13 @@
 import React, { useState } from 'react'
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { validateForm } from "../utils/formValidation";
 import ConfirmationModal from '../components/ConfirmationModal';
 import { loginUser } from '../redux/reducer/authReducer';
 const LoginPage = () => {
-    const loading = false;
 
+    const loading = false;
     const [formData, setFormData] = useState({
         email: "",
         password: ""
@@ -32,8 +32,6 @@ const LoginPage = () => {
             const response = await dispatch(
                 loginUser({ email: formData.email, password: formData.password })
             );
-            console.log(response, "response?????????????");
-
             if (
                 response.payload?.message === "Firebase: Error (auth/invalid-credential)." ||
                 response.payload?.message === "Firebase: Error (auth/invalid-email)."
@@ -143,7 +141,9 @@ const LoginPage = () => {
                                 </div>
                             </div>
                         </div>
-                        <div><p className='text-center font-bold'>Don't have an account? Sign up</p></div>
+                        <div>
+                            <p className="text-base text-center font-semibold">Don't have an account? <Link className="text-blue-600" to="/">Register</Link></p>
+                        </div>
                     </div>
                 </div>
                 {showModal && (
