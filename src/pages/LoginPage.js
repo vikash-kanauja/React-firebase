@@ -1,20 +1,18 @@
 import React, { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { validateForm } from "../utils/formValidation";
-import ConfirmationModal from '../components/ConfirmationModal';
 import { loginUser } from '../redux/reducer/authReducer';
 const LoginPage = () => {
 
-    const loading = false;
     const [formData, setFormData] = useState({
         email: "",
         password: ""
     })
     const [errors, setErrors] = useState({});
     const [showPassword, setShowPassword] = useState(false);
-    const [showModal, setShowModal] = useState(false);
+    const { loading } = useSelector((state) => state.auth);
     const handleChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
         setErrors({ ...errors, [e.target.name]: null });
@@ -23,7 +21,7 @@ const LoginPage = () => {
     const dispatch = useDispatch()
     const handleSubmit = async (e) => {
         e.preventDefault();
-        const validationErrors = validateForm(formData);
+        const validationErrors = validateForm(formData,false);
         const isValid = Object.values(validationErrors).every(
             (error) => error === null
         );
@@ -36,21 +34,17 @@ const LoginPage = () => {
                 response.payload?.message === "Firebase: Error (auth/invalid-credential)." ||
                 response.payload?.message === "Firebase: Error (auth/invalid-email)."
             ) {
-                setErrors({ ...errors, email: "Email or Password is incorrect" });
+                setErrors({ ...errors, password: "Email or Password is incorrect" });
                 return;
             }
             const userId = response.payload.uid;
             if (userId) {
-                setShowModal(true);
+                navigate("/home");
             }
 
         } else {
             setErrors(validationErrors);
         }
-    };
-    const modalHandleNavigate = () => {
-        setShowModal(false);
-        navigate("/home");
     };
     return (
         <div className="min-h-screen bg-gray-200 py-6 flex flex-col justify-center items-center sm:py-12">
@@ -142,18 +136,10 @@ const LoginPage = () => {
                             </div>
                         </div>
                         <div>
-                            <p className="text-base text-center font-semibold">Don't have an account? <Link className="text-blue-600" to="/">Register</Link></p>
+                            <p className="text-base text-center font-semibold">Don't have an account? <Link className="text-blue-600" to="/signup">Register</Link></p>
                         </div>
                     </div>
                 </div>
-                {showModal && (
-                    <ConfirmationModal
-                        heading={"Successfully"}
-                        message={`${"User Login Succesfully!"}`}
-                        clickOkButton={modalHandleNavigate}
-                        buttonText={"Ok"}
-                    />
-                )}
             </div>
         </div>
     )

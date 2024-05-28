@@ -49,7 +49,7 @@ const Register = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const validationErrors = validateForm(formData);
+    const validationErrors = validateForm(formData,true);
     const isValid = Object.values(validationErrors).every(
       (error) => error === null
     );
@@ -305,15 +305,13 @@ const Register = () => {
                   </button>
                 </div>
                 <div>
-                  <p className="text-base text-center font-semibold">Already have an account? <Link className="text-blue-600" to="/login">Login</Link></p>
+                  <p className="text-base text-center font-semibold">Already have an account? <Link className="text-blue-600" to="/">Login</Link></p>
                 </div>
               </div>
             </div>
           </div>
         </div>
         
-
-        {/* <p className="text-base text-center font-semibold">Already have an account? <Link className="text-blue-600" to="/">Login</Link></p> */}
         {showModal && (
           <ConfirmationModal
             heading={"Successfully"}
