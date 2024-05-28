@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { FaEye, FaEyeSlash, FaUserCircle } from "react-icons/fa";
+import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
 import { signupUser, storeUserData } from "../redux/reducer/authReducer";
 import { useNavigate } from "react-router-dom";
@@ -74,12 +74,10 @@ const Register = () => {
       setErrors(validationErrors);
     }
   };
-
   const modalHandleNavigate = () => {
     setShowModal(false);
     navigate("/home");
   };
-
   return (
     <div className="min-h-screen bg-gray-200 py-6 flex flex-col justify-center items-center sm:py-12">
       <div className="relative py-1 sm:mx-auto sm:w-6/12 md:w-[50%] lg:w-[40%] xl:w-[30%] 2xl:w-[25%]">
@@ -319,14 +317,6 @@ const Register = () => {
           />
         )}
       </div>
-      {showModal && (
-        <ConfirmationModal
-          heading={"Successfully"}
-          message={"User signup successfully!"}
-          clickOkButton={modalHandleNavigate}
-          buttonText={"Ok"}
-        />
-      )}
     </div>
   );
 };
