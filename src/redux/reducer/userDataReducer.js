@@ -7,8 +7,8 @@ import {
     where,
   } from "firebase/firestore";
 
-export const fetchData = createAsyncThunk(
-  'data/fetchData',
+export const getUserData = createAsyncThunk(
+  'data/getUserData',
   async (uid) => {
     try {
       const usersCollectionRef = collection(db, "users");
@@ -31,14 +31,14 @@ const userDataSlice = createSlice({
   reducers: {},
   extraReducers: (builder) => {
     builder
-      .addCase(fetchData.pending, (state) => {
+      .addCase(getUserData.pending, (state) => {
         state.loading = true;
       })
-      .addCase(fetchData.fulfilled, (state, action) => {
+      .addCase(getUserData.fulfilled, (state, action) => {
         state.loading = false;
         state.items = action.payload;
       })
-      .addCase(fetchData.rejected, (state, action) => {
+      .addCase(getUserData.rejected, (state, action) => {
         state.loading = false;
         state.error = action.error.message;
       });

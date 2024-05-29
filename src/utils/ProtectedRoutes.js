@@ -1,9 +1,10 @@
+
 import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate,Navigate } from "react-router-dom";
 import { auth } from "../firebase/firebaseConfig";
 import { onAuthStateChanged } from "firebase/auth";
 import { useDispatch } from "react-redux";
-import { fetchData } from "../redux/reducer/userDataReducer";
+import { getUserData } from "../redux/reducer/userDataReducer";
 
 const ProtectedRoutes = ({ Component, redirectTo, publicRoute }) => {
   const navigate = useNavigate();
@@ -14,14 +15,15 @@ const ProtectedRoutes = ({ Component, redirectTo, publicRoute }) => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {
         setIsAuthenticated(true);
-        dispatch(fetchData(user.uid))
+        dispatch(getUserData(user.uid))
       } else {
         setIsAuthenticated(false);
+        navigate('/')
       }
     });
     return () => unsubscribe();
   }, []);
-
+    console.log(publicRoute);
     if (!publicRoute && !isAuthenticated) {
       navigate('/');
     }
