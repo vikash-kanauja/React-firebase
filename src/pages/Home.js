@@ -7,7 +7,7 @@ import { useSelector} from "react-redux";
 const Home = () => {
   const navigate = useNavigate();
   const { items, loading } = useSelector((state) => state.data)
- 
+  
   const handleLogout = async () => {
     try {
       signOut(auth);
@@ -24,7 +24,7 @@ const Home = () => {
       </nav>
       <div className="flex flex-col justify-center m-12 items-center">
         <div className="bg-gray-300 p-8 flex justify-center rounded-md lg:w-1/2">
-          {loading ? (
+          {Object.keys(items).length === 0 || loading ? (
             <div className="flex items-center px-4 py-1">
               <div className="relative w-5 h-5">
                 <div className="w-full h-full rounded-full absolute "></div>
@@ -33,7 +33,7 @@ const Home = () => {
             </div>
           ) : (
             <div>
-              <div className="flex flex-col justify-center items-center"><p>user profile Photo :</p><img className="w-12 h-12 text-center" src={items.profilePhoto} /></div>
+              <div className="flex flex-col justify-center items-center"><p>user profile Photo :</p><img className="w-12 h-12 text-center" alt="profile" src={items.profilePhoto} /></div>
               <p>User Name : {items.firstName} {items.lastName}</p>
               <p>Email : {items.email}</p>
             </div>

@@ -1,5 +1,4 @@
 export const validateEmail = (email) => {
-  console.log("call from  login ", email);
   if (!email.trim()) {
     return "Email is required";
   } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {

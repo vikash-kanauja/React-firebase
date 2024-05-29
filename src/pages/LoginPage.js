@@ -30,7 +30,6 @@ const LoginPage = () => {
             const response = await dispatch(
                 loginUser({ email: formData.email, password: formData.password })
             );
-            console.log(response.uid,";dlfszkknfdnkslskldndf");
             if (
                 response.payload?.message === "Firebase: Error (auth/invalid-credential)." ||
                 response.payload?.message === "Firebase: Error (auth/invalid-email)."
