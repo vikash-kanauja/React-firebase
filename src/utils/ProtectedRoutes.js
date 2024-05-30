@@ -1,16 +1,15 @@
-
 import React, { useEffect, useState } from "react";
 import { useNavigate,Navigate } from "react-router-dom";
 import { auth } from "../firebase/firebaseConfig";
 import { onAuthStateChanged } from "firebase/auth";
 import { useDispatch } from "react-redux";
-import { getUserData } from "../redux/reducer/userDataReducer";
+import { getUserData } from "../redux/reducer/authReducer";
 
 const ProtectedRoutes = ({ Component, redirectTo, publicRoute }) => {
   const navigate = useNavigate();
   const dispatch = useDispatch()
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-
+  const token = localStorage.getItem("accessToken") || null;
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {
@@ -18,20 +17,26 @@ const ProtectedRoutes = ({ Component, redirectTo, publicRoute }) => {
         dispatch(getUserData(user.uid))
       } else {
         setIsAuthenticated(false);
-        navigate('/')
       }
     });
     return () => unsubscribe();
   }, []);
-    console.log(publicRoute);
-    if (!publicRoute && !isAuthenticated) {
+  useEffect(()=>{
+    if(token){
+      if(!isAuthenticated){
+        <Component />
+      }else{
+        navigate(redirectTo);
+      }
+    }
+  },[])
+  
+    if (!publicRoute && !token && !isAuthenticated) {
       navigate('/');
     }
-    if (publicRoute && isAuthenticated) {
+    if (publicRoute && token && isAuthenticated) {
       navigate(redirectTo);
     }
-
   return <Component />;
 };
-
 export default ProtectedRoutes;

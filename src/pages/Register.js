@@ -5,7 +5,7 @@ import { signupUser, storeUserData } from "../redux/reducer/authReducer";
 import { Link, useNavigate } from "react-router-dom";
 import { validateForm } from "../utils/formValidation";
 import ConfirmationModal from "../components/ConfirmationModal";
-
+import { getUserData } from "../redux/reducer/authReducer"
 const Register = () => {
   const [formData, setFormData] = useState({
     firstName: "",
@@ -24,8 +24,7 @@ const Register = () => {
   const [showModal, setShowModal] = useState(false);
   const navigate = useNavigate();
   const dispatch = useDispatch();
-
-  const { loading } = useSelector((state) => state.auth);
+  const {user, loading } = useSelector((state) => state.auth);
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
     setErrors({ ...errors, [e.target.name]: null });
@@ -66,15 +65,17 @@ const Register = () => {
         return;
       }
       const userId = res.payload.uid;
+      localStorage.setItem("accessToken", res.accessToken);
       if (userId) {
+        dispatch(storeUserData({ userId, formData }));
         setShowModal(true);
-        await dispatch(storeUserData({ userId, formData }));
+        }
+      } else {
+        setErrors(validationErrors);
       }
-    } else {
-      setErrors(validationErrors);
-    }
-  };
-  const modalHandleNavigate = () => {
+    };
+    const modalHandleNavigate = () => {
+    dispatch(getUserData(user.uid));
     setShowModal(false);
     navigate("/home");
   };

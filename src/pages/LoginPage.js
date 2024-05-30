@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { validateForm } from "../utils/formValidation";
-import { loginUser } from '../redux/reducer/authReducer';
+import { getUserData, loginUser } from '../redux/reducer/authReducer';
 const LoginPage = () => {
 
     const [formData, setFormData] = useState({
@@ -39,6 +39,7 @@ const LoginPage = () => {
             }
             const userId = response.payload.uid;
             if (userId) {
+                dispatch(getUserData(userId));
                 navigate("/home");
             }
 

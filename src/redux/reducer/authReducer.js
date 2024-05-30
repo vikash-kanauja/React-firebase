@@ -3,8 +3,13 @@ import { createUserWithEmailAndPassword ,signInWithEmailAndPassword} from "fireb
 import { auth, db } from "../../firebase/firebaseConfig";
 import { imageStorage } from "../../firebase/firebaseConfig";
 import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
-import { addDoc, collection } from "firebase/firestore";
-
+import {
+    collection,
+    getDocs,
+    query,
+    where,
+    addDoc,
+  } from "firebase/firestore";
 export const signupUser = createAsyncThunk("auth/signupUser", async (data, thunkAPI) => {
   try {
     const response = await createUserWithEmailAndPassword(
@@ -27,6 +32,7 @@ export const signupUser = createAsyncThunk("auth/signupUser", async (data, thunk
 export const loginUser = createAsyncThunk("auth/loginUser" , async (data, thunkAPI) =>{
     try{
         const response = await signInWithEmailAndPassword(auth,data.email,data.password)
+        localStorage.setItem("accessToken",response?.user.accessToken);
         return response.user;
     }catch(error){
     return thunkAPI.rejectWithValue({ message: error.message });
@@ -53,7 +59,21 @@ export const storeUserData = createAsyncThunk(
         email: data?.formData?.email,
         uid: data?.userId,
       };
-      await addDoc(collection(db, "users"), userInfo);
+       await addDoc(collection(db, "users"), userInfo);
+    } catch (error) {
+      return error;
+    }
+  }
+);
+
+export const getUserData = createAsyncThunk(
+  'data/getUserData',
+  async (uid) => {
+    try {
+      const usersCollectionRef = collection(db, "users");
+      const q = query(usersCollectionRef, where("uid", "==", `${uid}`));
+      const data = await getDocs(q);
+      return { ...data?.docs[0]?.data(), id: data?.docs[0]?.id };
     } catch (error) {
       return error;
     }
@@ -63,7 +83,7 @@ export const storeUserData = createAsyncThunk(
 const authSlice = createSlice({
   name: "auth",
   initialState: {
-    user: null,
+    user: [],
     loading: false,
     error: null,
   },
@@ -93,6 +113,9 @@ const authSlice = createSlice({
       .addCase(loginUser.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
+      })
+      .addCase(getUserData.fulfilled, (state, action) => {
+        state.user = action.payload;
       });
   },
 });
