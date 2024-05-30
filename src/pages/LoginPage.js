@@ -37,12 +37,7 @@ const LoginPage = () => {
                 setErrors({ ...errors, password: "Email or Password is incorrect" });
                 return;
             }
-            const userId = response.payload.uid;
-            if (userId) {
-                dispatch(getUserData(userId));
                 navigate("/home");
-            }
-
         } else {
             setErrors(validationErrors);
         }

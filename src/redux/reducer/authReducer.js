@@ -1,44 +1,52 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { createUserWithEmailAndPassword ,signInWithEmailAndPassword} from "firebase/auth";
+import {
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+} from "firebase/auth";
 import { auth, db } from "../../firebase/firebaseConfig";
 import { imageStorage } from "../../firebase/firebaseConfig";
 import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
-import {
-    collection,
-    getDocs,
-    query,
-    where,
-    addDoc,
-  } from "firebase/firestore";
-export const signupUser = createAsyncThunk("auth/signupUser", async (data, thunkAPI) => {
-  try {
-    const response = await createUserWithEmailAndPassword(
-      auth,
-      data.email,
-      data.password
-    );
-    const user = response.user;
-    const userData = {
-      uid: user.uid,
-      email: user.email,
-      accessToken: await user.getIdToken(),
-    };
-    return userData;
-  } catch (error) {
-    return thunkAPI.rejectWithValue({ message: error.message });
-  }
-});
-
-export const loginUser = createAsyncThunk("auth/loginUser" , async (data, thunkAPI) =>{
-    try{
-        const response = await signInWithEmailAndPassword(auth,data.email,data.password)
-        localStorage.setItem("accessToken",response?.user.accessToken);
-        return response.user;
-    }catch(error){
-    return thunkAPI.rejectWithValue({ message: error.message });
+import { collection, getDocs, query, where, addDoc } from "firebase/firestore";
+export const signupUser = createAsyncThunk(
+  "auth/signupUser",
+  async (data, thunkAPI) => {
+    try {
+      const response = await createUserWithEmailAndPassword(
+        auth,
+        data.email,
+        data.password
+      );
+      const user = response.user;
+      const userData = {
+        uid: user.uid,
+        email: user.email,
+        accessToken: await user.getIdToken(),
+      };
+      return userData;
+    } catch (error) {
+      console.log(error)
+      return thunkAPI.rejectWithValue({ message: error.message });
     }
+  }
+);
 
-})
+export const loginUser = createAsyncThunk(
+  "auth/loginUser",
+  async (data, thunkAPI) => {
+    try {
+      const response = await signInWithEmailAndPassword(
+        auth,
+        data.email,
+        data.password
+      );
+      localStorage.setItem("accessToken", response?.user.accessToken);
+      return response.user;
+    } catch (error) {
+      console.log(error)
+      return thunkAPI.rejectWithValue({ message: error.message });
+    }
+  }
+);
 
 export const storeUserData = createAsyncThunk(
   "auth/storeUserData",
@@ -59,31 +67,29 @@ export const storeUserData = createAsyncThunk(
         email: data?.formData?.email,
         uid: data?.userId,
       };
-       await addDoc(collection(db, "users"), userInfo);
+      await addDoc(collection(db, "users"), userInfo);
     } catch (error) {
       return error;
     }
   }
 );
 
-export const getUserData = createAsyncThunk(
-  'data/getUserData',
-  async (uid) => {
-    try {
-      const usersCollectionRef = collection(db, "users");
-      const q = query(usersCollectionRef, where("uid", "==", `${uid}`));
-      const data = await getDocs(q);
-      return { ...data?.docs[0]?.data(), id: data?.docs[0]?.id };
-    } catch (error) {
-      return error;
-    }
+export const getUserData = createAsyncThunk("data/getUserData", async (uid) => {
+  try {
+    console.log("Getuser");
+    const usersCollectionRef = collection(db, "users");
+    const q = query(usersCollectionRef, where("uid", "==", `${uid}`));
+    const data = await getDocs(q);
+    return { ...data?.docs[0]?.data(), id: data?.docs[0]?.id };
+  } catch (error) {
+    return error;
   }
-);
+});
 
 const authSlice = createSlice({
   name: "auth",
   initialState: {
-    user: [],
+    user: {},
     loading: false,
     error: null,
   },
@@ -115,6 +121,7 @@ const authSlice = createSlice({
         state.error = action.payload;
       })
       .addCase(getUserData.fulfilled, (state, action) => {
+        console.log(action.payload);
         state.user = action.payload;
       });
   },

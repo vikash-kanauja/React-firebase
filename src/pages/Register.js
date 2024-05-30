@@ -68,16 +68,20 @@ const Register = () => {
       localStorage.setItem("accessToken", res.accessToken);
       if (userId) {
         dispatch(storeUserData({ userId, formData }));
+        
         setShowModal(true);
         }
       } else {
         setErrors(validationErrors);
       }
     };
-    const modalHandleNavigate = () => {
-    dispatch(getUserData(user.uid));
-    setShowModal(false);
-    navigate("/home");
+    const modalHandleNavigate = async() => {
+    const res = await  dispatch(getUserData(user.uid));
+  
+      if(res) {
+        navigate("/home");
+        setShowModal(false);
+      }
   };
   return (
     <div className="min-h-screen bg-gray-200 py-6 flex flex-col justify-center items-center sm:py-12">
