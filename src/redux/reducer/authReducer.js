@@ -24,7 +24,6 @@ export const signupUser = createAsyncThunk(
       };
       return userData;
     } catch (error) {
-      console.log(error)
       return thunkAPI.rejectWithValue({ message: error.message });
     }
   }
@@ -42,7 +41,6 @@ export const loginUser = createAsyncThunk(
       localStorage.setItem("accessToken", response?.user.accessToken);
       return response.user;
     } catch (error) {
-      console.log(error)
       return thunkAPI.rejectWithValue({ message: error.message });
     }
   }
@@ -76,7 +74,6 @@ export const storeUserData = createAsyncThunk(
 
 export const getUserData = createAsyncThunk("data/getUserData", async (uid) => {
   try {
-    console.log("Getuser");
     const usersCollectionRef = collection(db, "users");
     const q = query(usersCollectionRef, where("uid", "==", `${uid}`));
     const data = await getDocs(q);
@@ -121,7 +118,6 @@ const authSlice = createSlice({
         state.error = action.payload;
       })
       .addCase(getUserData.fulfilled, (state, action) => {
-        console.log(action.payload);
         state.user = action.payload;
       });
   },
