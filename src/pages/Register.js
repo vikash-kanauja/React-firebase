@@ -2,10 +2,10 @@ import React, { useState } from "react";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
 import { signupUser, storeUserData } from "../redux/reducer/authReducer";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { validateForm } from "../utils/formValidation";
 import ConfirmationModal from "../components/ConfirmationModal";
-
+import { getUserData } from "../redux/reducer/authReducer"
 const Register = () => {
   const [formData, setFormData] = useState({
     firstName: "",
@@ -24,8 +24,7 @@ const Register = () => {
   const [showModal, setShowModal] = useState(false);
   const navigate = useNavigate();
   const dispatch = useDispatch();
-
-  const { loading } = useSelector((state) => state.auth);
+  const {user, loading } = useSelector((state) => state.auth);
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
     setErrors({ ...errors, [e.target.name]: null });
@@ -49,7 +48,7 @@ const Register = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const validationErrors = validateForm(formData);
+    const validationErrors = validateForm(formData,true);
     const isValid = Object.values(validationErrors).every(
       (error) => error === null
     );
@@ -66,17 +65,23 @@ const Register = () => {
         return;
       }
       const userId = res.payload.uid;
+      localStorage.setItem("accessToken", res.accessToken);
       if (userId) {
+        dispatch(storeUserData({ userId, formData }));
+        
         setShowModal(true);
-        await dispatch(storeUserData({ userId, formData }));
+        }
+      } else {
+        setErrors(validationErrors);
       }
-    } else {
-      setErrors(validationErrors);
-    }
-  };
-  const modalHandleNavigate = () => {
-    setShowModal(false);
-    navigate("/home");
+    };
+    const modalHandleNavigate = async() => {
+    const res = await  dispatch(getUserData(user.uid));
+  
+      if(res) {
+        navigate("/home");
+        setShowModal(false);
+      }
   };
   return (
     <div className="min-h-screen bg-gray-200 py-6 flex flex-col justify-center items-center sm:py-12">
@@ -304,10 +309,14 @@ const Register = () => {
                     )}
                   </button>
                 </div>
+                <div>
+                  <p className="text-base text-center font-semibold">Already have an account? <Link className="text-blue-600" to="/">Login</Link></p>
+                </div>
               </div>
             </div>
           </div>
         </div>
+        
         {showModal && (
           <ConfirmationModal
             heading={"Successfully"}

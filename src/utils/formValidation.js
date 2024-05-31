@@ -6,10 +6,10 @@ export const validateEmail = (email) => {
   }
     return null;
   };
-  export const validatePassword = (password) => {
+  export const validatePassword = (password ,isSignup) => {
     if (!password) {
       return "Password is required";
-    } else if (!/(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}/.test(password)) {
+    } else if (isSignup && !/(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}/.test(password)) {
       return "Password must contain at least one uppercase letter, one lowercase letter, and one digit";
   }
     return null;
@@ -50,7 +50,7 @@ export const validateEmail = (email) => {
     return null;
   };
   
-  export const validateForm = (formData) => {
+  export const validateForm = (formData,isSignup) => {
     const errors = {};
   
     if (formData.email !== undefined) {
@@ -58,7 +58,7 @@ export const validateEmail = (email) => {
     }
   
     if (formData.password !== undefined) {
-      errors.password = validatePassword(formData.password);
+      errors.password = validatePassword(formData.password,isSignup);
     }
   
     if (formData.confirmPassword !== undefined) {
