@@ -65,10 +65,11 @@ const Register = () => {
         return;
       }
       const userId = res.payload.uid;
-      localStorage.setItem("accessToken", res.accessToken);
+      console.log(res.payload.accessToken);
+      localStorage.setItem("accessToken", res.payload.accessToken);
+      console.log(res.accessToken);
       if (userId) {
         dispatch(storeUserData({ userId, formData }));
-        
         setShowModal(true);
         }
       } else {
@@ -312,6 +313,14 @@ const Register = () => {
                 <div>
                   <p className="text-base text-center font-semibold">Already have an account? <Link className="text-blue-600" to="/">Login</Link></p>
                 </div>
+{/* 
+                <p className="text-center">⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼  or continue with⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼ </p>
+                  <div className=" flex items-center justify-center gap-4 m-4">
+                    <div className="p-2 bg-gray-100 rounded-full drop-shadow-md transition duration-500 hover:scale-110 cursor-pointer"><FcGoogle className="text-2xl"/></div>
+                    <div className=" p-2 bg-gray-100 rounded-full drop-shadow-md text-blue-400 transition duration-500 hover:scale-110 cursor-pointer"><FaTwitter className="text-2xl"/></div>
+                    <div className="p-2 bg-gray-100 rounded-full drop-shadow-md text-blue-700 transition duration-500 hover:scale-110 cursor-pointer"><FaFacebookF className="text-2xl"/></div>
+                  </div>   */}
+
               </div>
             </div>
           </div>

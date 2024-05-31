@@ -22,6 +22,8 @@ export const signupUser = createAsyncThunk(
         email: user.email,
         accessToken: await user.getIdToken(),
       };
+      console.log(userData?.accessToken);
+      // localStorage.setItem("accessToken", userData?.accessToken);
       return userData;
     } catch (error) {
       return thunkAPI.rejectWithValue({ message: error.message });

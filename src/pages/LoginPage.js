@@ -1,7 +1,12 @@
 import React, { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom';
-import { useDispatch, useSelector } from 'react-redux';
 import { FaEye, FaEyeSlash } from "react-icons/fa";
+import { FaTwitter,FaFacebookF } from "react-icons/fa";
+import { FcGoogle } from "react-icons/fc";
+import { googleProvider,facebookProvider} from "../firebase/firebaseConfig"
+import { signInWithPopup } from "firebase/auth";
+import { auth } from '../firebase/firebaseConfig';
+import { useDispatch, useSelector } from 'react-redux';
 import { validateForm } from "../utils/formValidation";
 import { getUserData, loginUser } from '../redux/reducer/authReducer';
 const LoginPage = () => {
@@ -42,6 +47,17 @@ const LoginPage = () => {
             setErrors(validationErrors);
         }
     };
+    const socialClick = async (provider) => {
+        try {
+            console.log("google signup",provider);
+            const result = await signInWithPopup(auth, provider);
+            const user = result.user;
+            console.log(user);
+            
+        } catch (error) {
+          console.log(error);
+        }
+      };
     return (
         <div className="min-h-screen bg-gray-200 py-6 flex flex-col justify-center items-center sm:py-12">
             <div className="relative py-4 sm:mx-auto sm:w-6/12 md:w-[50%] lg:w-[40%] xl:w-[30%] 2xl:w-[25%]">
@@ -134,6 +150,13 @@ const LoginPage = () => {
                         <div>
                             <p className="text-base text-center font-semibold">Don't have an account? <Link className="text-blue-600" to="/signup">Register</Link></p>
                         </div>
+                        <p className="text-center mt-4">⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼  or continue with⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼ </p>
+                  <div className=" flex items-center justify-center gap-4 m-4">
+                    <div className="p-2 bg-gray-100 rounded-full drop-shadow-md transition duration-500 hover:scale-110 cursor-pointer" onClick={()=> socialClick(googleProvider)}><FcGoogle className="text-2xl"/></div>
+                    <div className=" p-2 bg-gray-100 rounded-full drop-shadow-md text-blue-400 transition duration-500 hover:scale-110 cursor-pointer" onClick={() => socialClick(facebookProvider)}><FaTwitter className="text-2xl"/></div>
+                    <div className="p-2 bg-gray-100 rounded-full drop-shadow-md text-blue-700 transition duration-500 hover:scale-110 cursor-pointer"><FaFacebookF className="text-2xl"/></div>
+                  </div>  
+
                     </div>
                 </div>
             </div>
